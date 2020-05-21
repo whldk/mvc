@@ -1,0 +1,28 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    RewriteCond %{REQUEST_URI} ^/mvc/$
+	RewriteRule ^.*$ index.php/html/content/index [L,END]
+    
+    RewriteCond %{REQUEST_URI} ^/mvc/posts$
+    RewriteRule ^.*$ index.php/html/content/posts?%{QUERY_STRING} [L,END]
+
+    RewriteCond %{REQUEST_URI} ^/mengoo_huashi/post$
+    RewriteRule ^.*$ index.php/html/content/post?%{QUERY_STRING} [L,END]
+
+    RewriteCond %{REQUEST_URI} ^/mvc/(upload/|index\.php)
+	RewriteCond %{REQUEST_FILENAME} -f
+	RewriteRule ^.*$ - [L,END]
+    
+    RewriteCond %{REQUEST_URI} ^/mvc/(index\.php\/)?resources\/resource(-folder)?\/upload$ [NC]
+	RewriteRule ^.*$ resources/index.php [L,END]
+    
+    RewriteCond %{REQUEST_URI} !^/mvc/upload/
+	RewriteRule ^.*$  index.php [L,END]
+    
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    
+    RewriteRule ^.*$ - [F]
+</IfModule>
