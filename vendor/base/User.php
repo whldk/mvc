@@ -13,7 +13,7 @@ class User
 	public $idParam = '__id';
 	public $authTimeoutParam = '__expire';
 	
-	public $authTimeout = APP_AUTH_TIMEOUT;	//30 * 60
+	public $authTimeout = APP_AUTH_TIMEOUT;
 	
 	/**
 	 * cookie related params
