@@ -26,7 +26,7 @@ CREATE TABLE `admin` (
   `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '登录名',
   `authkey` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '授权key',
   `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '密码hash',
-  `realname` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '真实姓名',
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '真实姓名',
   `status` tinyint(4) NOT NULL DEFAULT '1',
   `created_at` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `updated_at` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
