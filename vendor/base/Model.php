@@ -14,6 +14,7 @@ use vendor\exceptions\InvalidParamException;
  * @method \vendor\db\Db getDb()
  * @property \vendor\db\Db $db
  */
+
 class Model
 {
 	use ErrorTrait, AppTrait;
@@ -70,10 +71,14 @@ class Model
 	protected static $mustMatchFilter = [];
 	
 	protected static $rangeFilter = [];
-	
+
+    /**
+     * Model constructor.
+     * @throws InvalidConfigException
+     */
 	public function __construct()
 	{
-		//hashid需要依赖auto_inc生成
+		//hash id 需要依赖auto_inc生成
 		if (!isset(static::$sets['auto_inc']) && isset(static::$sets['hash_id'])) {
 			throw new InvalidConfigException();
 		}
@@ -147,13 +152,16 @@ class Model
 	
 		return $fields;
 	}
-	
-	/**
-	 * @param \vendor\base\Model $thisModel
-	 * @param \vendor\base\Model $thatModel
-	 * @param string|null $thatAlias
-	 * @param array|null $thatFields
-	 */
+
+
+    /**
+     * @param $thisModel
+     * @param $thatModel
+     * @param string $thatAlias
+     * @param null $thatFields
+     * @param null $middleModel
+     * @return array
+     */
 	public static function joinListFields($thisModel, $thatModel, $thatAlias = '', $thatFields = null, $middleModel = null)
 	{
 		$thisRawFields = array_keys($thisModel::fields());
@@ -193,9 +201,6 @@ class Model
 		return array_merge($thisFields, $thatFields, $middleListFields);
 	}
 	
-	/**
-	 * @var Hashids
-	 */
 	private static $hashids;
 	
 	final public static function hashids()
@@ -473,11 +478,17 @@ class Model
 	{
 		throw new DbErrorException();
 	}
-	
-	/**
-	 * 注意数量问题
-	 * @return array
-	 */
+
+    /**
+     * 用于查询
+     * @param $where
+     * @param array $fields
+     * @param int $num
+     * @param array $orderby
+     * @param array $groupby
+     * @return array|int|null
+     * @throws DbErrorException
+     */
 	final public static function _select($where, $fields = [], int $num = 0, array $orderby = [], array $groupby = [])
 	{
 		$fields ?: $fields = static::getFields() ?: '*';
@@ -516,14 +527,17 @@ class Model
 		return $res;
 	}
 	
-	/**
-	 * @param mixed $where
-	 * @param array $fields
-	 * @param int $num
-	 * @param array $orderby
-	 * @param array $groupby
-	 * @return array
-	 */
+
+    /**
+     * 查询更新
+     * @param $where
+     * @param array $fields
+     * @param int $num
+     * @param array $orderby
+     * @param array $groupby
+     * @return array|int|null
+     * @throws DbErrorException
+     */
 	final public static function _select_for_update($where, $fields = [], int $num = 0, array $orderby = [], array $groupby = [])
 	{
 		$fields ?: $fields = static::getFields() ?: '*';
@@ -561,10 +575,15 @@ class Model
 		
 		return $res;
 	}
-	
-	/**
-	 * @return array
-	 */
+
+    /**
+     * 更新行
+     * @param $where
+     * @param string $col
+     * @param string $indexby
+     * @return array
+     * @throws DbErrorException
+     */
 	final public static function _select_col($where, string $col, string $indexby = '')
 	{
 		if ($indexby) {
@@ -585,26 +604,33 @@ class Model
 		$res = self::_select_one($where, [$col]);
 		return $res ? $res[$col] : false;
 	}
-	
-	/**
-	 * @param mixed $where
-	 * @param array $fields
-	 * @param array $orderby
-	 * @return array
-	 */
+
+    /**
+     * 查询一条数据
+     * @param $where
+     * @param array $fields
+     * @param array $orderby
+     * @return array|mixed
+     * @throws DbErrorException
+     */
 	final public static function _select_one($where, $fields = [], $orderby = [])
 	{
 		$res = self::_select($where, $fields, 1, $orderby);
 		return $res ? $res[0] : [];
 	}
-	
-	/**
-	 * @param array $inserts
-	 * @param array $fields
-	 * @param int $chunkSize
-	 * @param bool $ignore
-	 * @return number
-	 */
+
+    /**
+     * 批量查询
+     * @param array $inserts
+     * @param array $fields
+     * @param int $chunkSize
+     * @param bool|null $ignore
+     * @return int|mixed|null
+     * @throws DbErrorException
+     * @throws RollbackException
+     * @throws UnknownException
+     * @throws UserErrorException
+     */
 	final public static function _batch_insert(array $inserts, array $fields, int $chunkSize = 100, ?bool $ignore = null)
 	{
 		$inserts = (array)$inserts;
@@ -630,7 +656,18 @@ class Model
 		
 		return $res;
 	}
-	
+
+    /**
+     *  插入数据
+     * @param $fields
+     * @param null $dku
+     * @param bool $dku_raw
+     * @param null $ignore
+     * @return array|int|null
+     * @throws DbErrorException
+     * @throws InvalidParamException
+     * @throws UnknownException
+     */
 	final public static function _insert($fields, $dku = null, $dku_raw = false, $ignore = null)
 	{
 		if (isset(static::$sets['auto_inc']) && !$dku) {
